@@ -1,0 +1,12 @@
+# Environnement virtuel
+venv/
+.venv/
+env/
+
+# Fichiers Python temporaires
+__pycache__/
+*.py[cod]
+
+# Fichiers de configuration sensibles (identifiants Cloud)
+config.py
+.env
