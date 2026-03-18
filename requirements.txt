@@ -1,1 +1,7 @@
-streamlit pymongo neo4j pandas matplotlib seaborn
+streamlit 
+pymongo 
+neo4j 
+pandas 
+matplotlib 
+seaborn
+python-dotenv
