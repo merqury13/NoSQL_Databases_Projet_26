@@ -1,23 +1,25 @@
-# pip3 install neo4j-driver
-# python3 example.py
-
+import os
+import streamlit as st
 from neo4j import GraphDatabase, basic_auth
+from dotenv import load_dotenv
 
-driver = GraphDatabase.driver(
-  "bolt://32.192.235.188:7687",
-  auth=basic_auth("neo4j", "nonavailability-modules-heading"))
+load_dotenv()
 
-cypher_query = '''
-MATCH (n)
-RETURN COUNT(n) AS count
-LIMIT $limit
-'''
+def get_neo4j_driver():
+    uri = st.secrets.get("NEO4J_URI") or os.getenv("NEO4J_URI")
+    user = st.secrets.get("NEO4J_USERNAME") or os.getenv("NEO4J_USERNAME")
+    password = st.secrets.get("NEO4J_PASSWORD") or os.getenv("NEO4J_PASSWORD")
 
-with driver.session(database="neo4j") as session:
-  results = session.read_transaction(
-    lambda tx: tx.run(cypher_query,
-                      limit=10).data())
-  for record in results:
-    print(record['count'])
+    if not all([uri, user, password]):
+        st.error("Identifiants Neo4j manquants")
+        return None
 
-driver.close()
+    return GraphDatabase.driver(uri, auth=basic_auth(user, password))
+
+def run_query(query, parameters=None):
+    driver = get_neo4j_driver()
+    if not driver: return None
+    
+    with driver.session(database="neo4j") as session:
+        result = session.run(query, parameters)
+        return result.data()
