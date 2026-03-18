@@ -10,3 +10,6 @@ __pycache__/
 # Fichiers de configuration sensibles (identifiants Cloud)
 config.py
 .env
+*.env
+
+neo4j_manager.py
