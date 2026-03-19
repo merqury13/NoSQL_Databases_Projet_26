@@ -27,3 +27,9 @@ def test_mongo():
     except Exception as e:
         print(f"Erreur Mongo: {e}")
         return False
+    
+def get_mongo_db():
+    client = get_mongo_client()
+    # Tu peux aussi mettre "entertainment" dans tes secrets/env
+    db_name = st.secrets.get("MONGO_DB_NAME") or os.getenv("MONGO_DB_NAME") or "entertainment"
+    return client[db_name]

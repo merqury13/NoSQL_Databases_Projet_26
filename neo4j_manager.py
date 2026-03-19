@@ -20,6 +20,9 @@ def run_query(query, parameters=None):
     driver = get_neo4j_driver()
     if not driver: return None
     
-    with driver.session(database="neo4j") as session:
-        result = session.run(query, parameters)
-        return result.data()
+    try:
+        with driver.session(database="neo4j") as session:
+            result = session.run(query, parameters)
+            return list(result) 
+    finally:
+        driver.close()
