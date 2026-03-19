@@ -11,25 +11,44 @@ def migrate_mongo_to_neo4j():
 
     with neo4j_driver.session() as session:
         for movie in films:
-            # --- CRÉATION DU NŒUD FILM ---
-            # On respecte les champs demandés : id, title, year, Votes, Revenue, rating, director [cite: 84]
+            # Sécurisation des données (évite les KeyError 'title')
+            m_id = str(movie.get('_id'))
+            m_title = movie.get('title') or movie.get('Title') or "Untitled"
+            m_year = movie.get('year', 0)
+            m_votes = movie.get('Votes', 0)
+            m_rating = movie.get('rating', "N/A")
+            m_revenue = movie.get('Revenue (Millions)', 0)
+            m_director = movie.get('Director', "Unknown")
+
+            # --- 2. CRÉATION DU NŒUD FILM ---
             session.run("""
                 MERGE (f:Film {id: $id})
                 SET f.title = $title, f.year = $year, f.votes = $votes, 
                     f.revenue = $revenue, f.rating = $rating, f.director = $director
-            """, id=str(movie['_id']), title=movie['title'], year=movie['year'], 
-                 votes=movie['Votes'], revenue=movie.get('Revenue (Millions)', 0), 
-                 rating=movie['rating'], director=movie['Director'])
+            """, id=m_id, title=m_title, year=m_year, 
+                 votes=m_votes, revenue=m_revenue, 
+                 rating=m_rating, director=m_director)
 
-            # --- CRÉATION DES ACTEURS ET RELATIONS ---
-            # Le champ Actors est souvent une string séparée par des virgules 
-            actors_list = [a.strip() for a in movie['Actors'].split(',')]
-            for actor_name in actors_list:
-                session.run("""
-                    MERGE (a:Actor {name: $name})
-                    WITH a
-                    MATCH (f:Film {id: $id})
-                    MERGE (a)-[:A_JOUE]->(f)
-                """, name=actor_name, id=str(movie['_id']))
+            # --- 3. CRÉATION DES ACTEURS ET RELATIONS ---
+            raw_actors = movie.get('Actors', "")
+            if raw_actors:
+                # Nettoyage de la chaîne de caractères pour obtenir une liste
+                actors_list = [a.strip() for a in raw_actors.split(',')]
+                
+                for actor_name in actors_list:
+                    session.run("""
+                        MERGE (a:Actor {name: $name})
+                        WITH a
+                        MATCH (f:Film {id: $id})
+                        MERGE (a)-[:A_JOUE]->(f)
+                    """, name=actor_name, id=m_id)
+            
+            # --- 4. CRÉATION DU RÉALISATEUR (Optionnel mais recommandé par le sujet [cite: 89]) ---
+            session.run("""
+                MERGE (d:Realisateur {name: $name})
+                WITH d
+                MATCH (f:Film {id: $id})
+                MERGE (d)-[:A_REALISE]->(f)
+            """, name=m_director, id=m_id)
 
     print("✅ Migration terminée avec succès !")
