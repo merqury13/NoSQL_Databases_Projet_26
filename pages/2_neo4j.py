@@ -1,9 +1,8 @@
 import streamlit as st
-from mongo_manager import get_mongo_client
 from neo4j_manager import run_query
 
 # --- SECTION NEO4J ---
-st.header("🕸️ Relations et Graphes (Neo4j)")
+st.header("Relations et Graphes (Neo4j)")
 
 # Requête Cypher pour compter les nœuds
 cypher_count = "MATCH (n) RETURN count(n) AS total"
