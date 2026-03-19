@@ -1,6 +1,6 @@
 import streamlit as st
-from databases.mongo_manager import get_mongo_client
-from databases.neo4j_manager import run_query
+from mongo_manager import get_mongo_client
+from neo4j_manager import run_query
 
 # Configuration de la page
 st.set_page_config(page_title="Mon Dashboard Multi-NoSQL", layout="wide")
