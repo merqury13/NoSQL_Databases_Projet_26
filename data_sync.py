@@ -6,12 +6,12 @@ def migrate_mongo_to_neo4j():
     db = mongo_client.entertainment
     neo4j_driver = get_neo4j_driver()
 
-    # 1. Récupérer les films de MongoDB
+    # 1. Get the movies from MongoDB 
     films = list(db.films.find({}))
 
     with neo4j_driver.session() as session:
         for movie in films:
-            # Sécurisation des données (évite les KeyError 'title')
+            # Get the different attributes
             m_id = str(movie.get('_id'))
             m_title = movie.get('title') or movie.get('Title') or "Untitled"
             m_year = movie.get('year', 0)
@@ -20,7 +20,7 @@ def migrate_mongo_to_neo4j():
             m_revenue = movie.get('Revenue (Millions)', 0)
             m_director = movie.get('Director', "Unknown")
 
-            # --- 2. CRÉATION DU NŒUD FILM ---
+            # --- 2. Building movie nodes ---
             session.run("""
                 MERGE (f:Film {id: $id})
                 SET f.title = $title, f.year = $year, f.votes = $votes, 
@@ -29,10 +29,10 @@ def migrate_mongo_to_neo4j():
                  votes=m_votes, revenue=m_revenue, 
                  rating=m_rating, director=m_director)
 
-            # --- 3. CRÉATION DES ACTEURS ET RELATIONS ---
+            # --- 3. Building actor nodes and relations ---
             raw_actors = movie.get('Actors', "")
             if raw_actors:
-                # Nettoyage de la chaîne de caractères pour obtenir une liste
+                # Cleaning strings to get a list
                 actors_list = [a.strip() for a in raw_actors.split(',')]
                 
                 for actor_name in actors_list:
@@ -43,7 +43,7 @@ def migrate_mongo_to_neo4j():
                         MERGE (a)-[:A_JOUE]->(f)
                     """, name=actor_name, id=m_id)
             
-            # --- 4. CRÉATION DU RÉALISATEUR (Optionnel mais recommandé par le sujet [cite: 89]) ---
+            # --- 4. Building the director nodes ---
             session.run("""
                 MERGE (d:Realisateur {name: $name})
                 WITH d

@@ -18,11 +18,11 @@ st.write("This project, developed for the 2025-2026 academic year, is a comprehe
 "modular code organization.")
 
 
-st.sidebar.title("Administration")#to update the Neo4j DB according to MongoDB
-if st.sidebar.button("Initialiser Neo4j depuis MongoDB"):
-    with st.spinner("Migration en cours..."):
+st.sidebar.title("Update Neo4j according to MongoDB")#to update the Neo4j DB according to MongoDB
+if st.sidebar.button("Updating Neo4j DB from MongoDB"):
+    with st.spinner("Migrating..."):
         try:
             migrate_mongo_to_neo4j()
-            st.sidebar.success("Données injectées dans Neo4j !")
+            st.sidebar.success("Neo4j DB updated !")
         except Exception as e:
-            st.sidebar.error(f"Erreur lors de la migration : {e}")
+            st.sidebar.error(f"Error when updating : {e}")
