@@ -8,7 +8,7 @@ from data_sync import migrate_mongo_to_neo4j
 st.set_page_config(page_title="Mon Dashboard Multi-NoSQL", layout="wide")
 st.title("🎬 Analyse de Films (Mongo + Neo4j)")
 
-st.write("This project, developed for the 2025-2026 academic year, is a comprehensive data " \
+st.write("This project, developed for the 2025-2026 fourth ESIEA academic year, is a comprehensive data " \
 "exploration and visualization application built with Streamlit. It demonstrates the integration of two " \
 "distinct database paradigms: MongoDB for document-oriented storage and Neo4j for graph-based relationship" \
 " analysis. \n" \
@@ -16,6 +16,8 @@ st.write("This project, developed for the 2025-2026 academic year, is a comprehe
 "movie metadata in MongoDB to complex network analysis and pathfinding in Neo4j—while adhering to " \
 "professional development standards such as virtual environments, secure credential management, and " \
 "modular code organization.")
+
+st.write("Explore the other pages to discover the information we can find in our DBs !")
 
 
 st.sidebar.title("Update Neo4j according to MongoDB")#to update the Neo4j DB according to MongoDB
