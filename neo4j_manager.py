@@ -11,7 +11,7 @@ def get_neo4j_driver():
     password = st.secrets.get("NEO4J_PASSWORD") or os.getenv("NEO4J_PASSWORD")
 
     if not all([uri, user, password]):
-        st.error("Identifiants Neo4j manquants")
+        st.error("Missing Neo4j id")
         return None
 
     return GraphDatabase.driver(uri, auth=basic_auth(user, password))

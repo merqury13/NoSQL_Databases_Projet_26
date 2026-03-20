@@ -52,9 +52,9 @@ def migrate_mongo_to_neo4j():
             """, name=m_director, id=m_id)
 
             # --- 5. Building genre nodes and relations ---
-            raw_genres = movie.get('genre', "") # Vérifie bien la majuscule dans ton Atlas MongoDB
+            raw_genres = movie.get('genre', "") 
             if raw_genres:
-                # On transforme "Action,Adventure" en ["Action", "Adventure"]
+                #Splitting words in a string into actual tables
                 genre_list = [g.strip() for g in raw_genres.split(',')]
                 
                 for genre_name in genre_list:
@@ -65,4 +65,4 @@ def migrate_mongo_to_neo4j():
                         MERGE (f)-[:HAS_GENRE]->(g)
                     """, name=genre_name, id=m_id)
 
-    print("✅ Migration terminée avec succès !")
+    print("✅ Migration successfully achieved !")

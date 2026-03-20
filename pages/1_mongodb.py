@@ -4,11 +4,11 @@ import plotly.express as px
 from mongo_manager import get_mongo_client
 from neo4j_manager import run_query
 
-# Configuration de la page
+# Page setting up
 st.set_page_config(page_title="Mon Dashboard Multi-NoSQL", layout="wide")
 st.title("🎬 Analysing with Mongo")
 
-# --- SECTION MONGODB ---
+# --- MONGODB SECTION---
 st.header("📊 Global statistics")
 client = get_mongo_client()
 
@@ -17,13 +17,10 @@ if client:
         db = client.entertainment  #DB name on mongo
         collection = db.films #to reduce writing in queries 
 
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            total_films = db.films.count_documents({})
-            st.metric("Total des films", total_films)
-            
-        # with col2:    
+        filter_query = {"_id": {"$regex": "^[0-9]{1,3}$"}}  
+        total_films = db.films.count_documents(filter_query)
+        st.metric("Total des films", total_films)
+           
         
         st.subheader("1. Display the year in which the highest number of films were released.")
         qOne = collection.aggregate([
@@ -118,7 +115,7 @@ if client:
         directors = list(collection.aggregate(pipeline_q7))
         if directors:
             for d in directors:
-                # On gère le cas où le nom du directeur est manquant (None)
+                # Making sure we manage the case were director is smissing
                 name = d['_id'] if d['_id'] else "Unknown Director"
                 st.write(f"- **{name}** : {d['count']} films")
         else:
@@ -144,12 +141,12 @@ if client:
 
         st.subheader("9. Which are the 3 highest-rated films for each decade (1990–1999, 2000–2009, etc.)?")
         pipeline_q9 = [
-        # 1. On filtre les films qui n'ont pas de note ou d'année
+        # 1.We sort out movies without year or rating
         {"$match": {
             "year": {"$type": "number"},
             "rating": {"$ne": "unrated"}
         }},
-        # 2. On calcule la décennie (ex: 2016 -> 2010)
+        # 2. Computing decade
         {"$project": {
             "title": 1,
             "rating": 1,
@@ -160,19 +157,19 @@ if client:
                 ]
             }
         }},
-        # 3. On trie par note décroissante AVANT de grouper
+        # 3. sort descending way before grouping
         {"$sort": {"rating": -1}},
-        # 4. On groupe par décennie et on "pousse" les films dans une liste
+        # 4. group by decade and push movies into lists
         {"$group": {
             "_id": "$decade",
             "top_films": {"$push": {"title": "$title", "rating": "$rating"}}
         }},
-        # 5. On ne garde que les 3 premiers de chaque liste
+        # 5. We keep only the first 3 movies from each list
         {"$project": {
             "decade": "$_id",
             "top_films": {"$slice": ["$top_films", 3]}
         }},
-        # 6. Tri par décennie chronologique
+        # 6. Sort by decade
         {"$sort": {"_id": 1}}
         ]
         results_q9 = list(collection.aggregate(pipeline_q9))
@@ -183,7 +180,7 @@ if client:
                     for i, movie in enumerate(doc['top_films'], 1):
                         st.write(f"{i}. **{movie['title']}** — {movie['rating']}")
         else:
-            st.info("Aucune donnée disponible pour les décennies.")
+            st.info("No data available regarding decades.")
 
         #################################################################################################################
         
@@ -266,7 +263,7 @@ if client:
         res_q13 = list(collection.aggregate(pipeline_q13))
         if res_q13:
             df_trend = pd.DataFrame(res_q13).rename(columns={"_id": "Decade", "avg_runtime": "Avg Duration"})
-            # Graphique en ligne pour montrer la tendance
+            # Chart to show results
             fig_trend = px.line(df_trend, x="Decade", y="Avg Duration", markers=True, title="Evolution of Movie Length")
             st.plotly_chart(fig_trend)
             st.write("Yes, there does seem to be a trend, but it is not linear. We saw a significant trend towards shorter" \

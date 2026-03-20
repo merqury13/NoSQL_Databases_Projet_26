@@ -5,8 +5,7 @@ from data_sync import migrate_mongo_to_neo4j
 
 
 # Configuration de la page
-st.set_page_config(page_title="Mon Dashboard Multi-NoSQL", layout="wide")
-st.title("🎬 Analyse de Films (Mongo + Neo4j)")
+st.title("🎬 Movies DB analysis project (Mongo + Neo4j)")
 
 st.write("This project, developed for the 2025-2026 fourth ESIEA academic year, is a comprehensive data " \
 "exploration and visualization application built with Streamlit. It demonstrates the integration of two " \
@@ -20,7 +19,7 @@ st.write("This project, developed for the 2025-2026 fourth ESIEA academic year, 
 st.write("Explore the other pages to discover the information we can find in our DBs !")
 
 
-st.sidebar.title("Update Neo4j according to MongoDB")#to update the Neo4j DB according to MongoDB
+st.sidebar.title("Update Neo4j according to MongoDB")#to update the Neo4j DB following MongoDB
 if st.sidebar.button("Updating Neo4j DB from MongoDB"):
     with st.spinner("Migrating..."):
         try:

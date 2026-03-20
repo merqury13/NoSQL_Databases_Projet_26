@@ -85,7 +85,6 @@ if data_neo:
 
     if result_17 and result_17[0]['average_votes'] is not None:
         avg_votes = result_17[0]['average_votes']
-        # Affichage avec séparateur de milliers pour plus de lisibilité
         st.info(f"The average number of votes per film is **{avg_votes:,.0f}**")
     else:
         st.warning("No voting data found in the database.")
@@ -182,7 +181,7 @@ if data_neo:
     else:
         st.warning("No actor/director relationships found.")
     #################################################################################################################
-    @st.cache_data # Pour ne pas relancer la requête à chaque clic
+    @st.cache_data # to avoid a new query each time
     def get_all_actors():
         query = "MATCH (a:Actor) RETURN a.name AS name ORDER BY name ASC"
         results = run_query(query)
@@ -271,7 +270,7 @@ if data_neo:
                 node_ids = set()
 
                 for node in path.nodes:
-                    nid = node.element_id # ou node.id selon ta version
+                    nid = node.element_id 
                     if nid not in node_ids:
                         label = node['name'] if "Actor" in node.labels else node['title']
                         color = "#FF4B4B" if "Actor" in node.labels else "#1c83e1"
